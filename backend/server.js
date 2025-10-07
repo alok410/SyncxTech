@@ -1,7 +1,7 @@
-import express from "express";
-import cors from "cors";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
@@ -10,9 +10,9 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || "";
+const MONGO_URI = process.env.MONGO_URI;
 
-// ✅ Connect to MongoDB with async/await for better reliability
+// ✅ Connect to MongoDB properly before handling requests
 const connectDB = async () => {
   try {
     if (!MONGO_URI) {
@@ -21,9 +21,9 @@ const connectDB = async () => {
 
     await mongoose.connect(MONGO_URI);
     console.log("✅ MongoDB connected successfully");
-  } catch (err: any) {
+  } catch (err) {
     console.error("❌ MongoDB connection failed:", err.message);
-    process.exit(1);
+    process.exit(1); // stop server if DB not connected
   }
 };
 
@@ -57,23 +57,24 @@ app.post("/api/contact", async (req, res) => {
       technology,
       purpose,
     });
+
     const savedContact = await newContact.save();
     res.status(200).json({ success: true, data: savedContact });
-  } catch (err: any) {
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get("/api/contact", async (_req, res) => {
+app.get("/api/contact", async (req, res) => {
   try {
     const contacts = await Contact.find().sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: contacts });
-  } catch (err: any) {
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// 🔹 Start server after DB connects
+// ✅ Start server only after DB connects
 connectDB().then(() => {
-  app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
 });
