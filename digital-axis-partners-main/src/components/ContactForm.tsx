@@ -93,7 +93,7 @@ export const ContactForm = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(`https://syncxtech.onrender.com/`, {
+      const res = await fetch(`https://syncxtech.onrender.com/api/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
