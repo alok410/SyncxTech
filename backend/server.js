@@ -12,18 +12,20 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// ✅ Connect to MongoDB properly before handling requests
+// ✅ MongoDB connection with detailed console logs
 const connectDB = async () => {
   try {
+    console.log("🔄 Attempting MongoDB connection...");
+    console.log("🌐 MONGO_URI:", MONGO_URI ? "Loaded ✅" : "Missing ❌");
+
     if (!MONGO_URI) {
-      throw new Error("Missing MONGO_URI in environment variables");
+      throw new Error("MONGO_URI is missing in environment variables.");
     }
 
     await mongoose.connect(MONGO_URI);
-    console.log("✅ MongoDB connected successfully");
+    console.log("✅ MongoDB connection established successfully!");
   } catch (err) {
     console.error("❌ MongoDB connection failed:", err.message);
-    process.exit(1); // stop server if DB not connected
   }
 };
 
@@ -61,6 +63,7 @@ app.post("/api/contact", async (req, res) => {
     const savedContact = await newContact.save();
     res.status(200).json({ success: true, data: savedContact });
   } catch (err) {
+    console.error("❌ Error saving contact:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -70,11 +73,12 @@ app.get("/api/contact", async (req, res) => {
     const contacts = await Contact.find().sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: contacts });
   } catch (err) {
+    console.error("❌ Error fetching contacts:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 // ✅ Start server only after DB connects
 connectDB().then(() => {
-  app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
 });
