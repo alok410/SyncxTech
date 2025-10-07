@@ -1,67 +1,79 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
-const mongoose_1 = __importDefault(require("mongoose"));
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
-const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
-app.use(express_1.default.json());
+import express from "express";
+import cors from "cors";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
 const PORT = process.env.PORT || 5000;
-// Connect to MongoDB
-mongoose_1.default.connect(process.env.MONGO_URI || "", {
-    autoIndex: true
-})
-    .then(() => console.log("MongoDB connected"))
-    .catch(err => console.error("MongoDB connection error:", err));
-// Define a Mongoose schema
-const contactSchema = new mongoose_1.default.Schema({
-    name: { type: String, required: true },
-    email: String,
-    phone: String,
-    companyName: String,
-    projectType: String,
-    technology: String,
-    purpose: String,
-    createdAt: { type: Date, default: Date.now }
+const MONGO_URI = process.env.MONGO_URI || "";
+
+// ✅ Connect to MongoDB with async/await for better reliability
+const connectDB = async () => {
+  try {
+    if (!MONGO_URI) {
+      throw new Error("Missing MONGO_URI in environment variables");
+    }
+
+    await mongoose.connect(MONGO_URI);
+    console.log("✅ MongoDB connected successfully");
+  } catch (err: any) {
+    console.error("❌ MongoDB connection failed:", err.message);
+    process.exit(1);
+  }
+};
+
+// 🔹 Define schema & model
+const contactSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: String,
+  phone: String,
+  companyName: String,
+  projectType: String,
+  technology: String,
+  purpose: String,
+  createdAt: { type: Date, default: Date.now },
 });
-// Create a model
-const Contact = mongoose_1.default.model("Contact", contactSchema);
-// POST endpoint to receive form data
+
+const Contact = mongoose.model("Contact", contactSchema);
+
+// 🔹 Routes
 app.post("/api/contact", async (req, res) => {
-    const { name, email, phone, companyName, projectType, technology, purpose } = req.body;
-    if (!name) {
-        return res.status(400).json({ error: "Name is required" });
-    }
-    try {
-        const newContact = new Contact({
-            name,
-            email,
-            phone,
-            companyName,
-            projectType,
-            technology,
-            purpose
-        });
-        const savedContact = await newContact.save();
-        res.status(200).json({ success: true, data: savedContact });
-    }
-    catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+  const { name, email, phone, companyName, projectType, technology, purpose } = req.body;
+
+  if (!name) return res.status(400).json({ error: "Name is required" });
+
+  try {
+    const newContact = new Contact({
+      name,
+      email,
+      phone,
+      companyName,
+      projectType,
+      technology,
+      purpose,
+    });
+    const savedContact = await newContact.save();
+    res.status(200).json({ success: true, data: savedContact });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
-// Optional: GET all contacts
-app.get("/api/contact", async (req, res) => {
-    try {
-        const contacts = await Contact.find().sort({ createdAt: -1 });
-        res.status(200).json({ success: true, data: contacts });
-    }
-    catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+
+app.get("/api/contact", async (_req, res) => {
+  try {
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: contacts });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+// 🔹 Start server after DB connects
+connectDB().then(() => {
+  app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+});
