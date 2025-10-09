@@ -79,7 +79,7 @@ export const AIChatbot = () => {
       {/* Chat Button */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-gradient-to-r from-primary to-accent shadow-[var(--shadow-glow)] hover:scale-110 transition-all duration-300 animate-float"
+        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-gradient-to-r from-primary to-accent shadow-[var(--shadow-glow)] hover:scale-110   animate-float"
         size="icon"
       >
         {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
