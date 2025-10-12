@@ -59,6 +59,39 @@ app.post("/api/contact", async (req, res) => {
       technology,
       purpose,
     });
+    const express = require('express');
+const router = express.Router();
+const Contact = require('../models/Contact'); // your MongoDB model
+const sendEmail = require('../email');
+
+router.post('/', async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    // Save to MongoDB
+    const newContact = new Contact({ name, email, message });
+    await newContact.save();
+
+    // Send email notification
+    await sendEmail({
+      to: 'alokpatel41001@gmail.com', // your email
+      subject: `New Contact Form Submission from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+      html: `<h3>New Contact Form Submission</h3>
+             <p><strong>Name:</strong> ${name}</p>
+             <p><strong>Email:</strong> ${email}</p>
+             <p><strong>Message:</strong> ${message}</p>`
+    });
+
+    res.status(200).json({ message: 'Form submitted successfully!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Something went wrong!' });
+  }
+});
+
+module.exports = router;
+
 
     const savedContact = await newContact.save();
     res.status(200).json({ success: true, data: savedContact });
