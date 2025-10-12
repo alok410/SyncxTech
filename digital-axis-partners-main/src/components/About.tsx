@@ -14,7 +14,7 @@ const values = [
   },
   {
     icon: Users,
-    title: "Collaboration",
+    title: "Collaborations",
     description: "Working together for success",
   },
   {
