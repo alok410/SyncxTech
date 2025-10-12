@@ -72,16 +72,16 @@ router.post('/', async (req, res) => {
     const newContact = new Contact({ name, email, message });
     await newContact.save();
 
-    // Send email notification
-    await sendEmail({
-      to: 'alokpatel41001@gmail.com', // your email
-      subject: `New Contact Form Submission from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
-      html: `<h3>New Contact Form Submission</h3>
-             <p><strong>Name:</strong> ${name}</p>
-             <p><strong>Email:</strong> ${email}</p>
-             <p><strong>Message:</strong> ${message}</p>`
-    });
+    // // Send email notification
+    // await sendEmail({
+    //   to: 'alokpatel41001@gmail.com', // your email
+    //   subject: `New Contact Form Submission from ${name}`,
+    //   text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+    //   html: `<h3>New Contact Form Submission</h3>
+    //          <p><strong>Name:</strong> ${name}</p>
+    //          <p><strong>Email:</strong> ${email}</p>
+    //          <p><strong>Message:</strong> ${message}</p>`
+    // });
 
     res.status(200).json({ message: 'Form submitted successfully!' });
   } catch (err) {
