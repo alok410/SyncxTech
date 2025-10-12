@@ -9,7 +9,7 @@ const values = [
   },
   {
     icon: Eye,
-    title: "Quality",
+    title: "Qualities",
     description: "Excellence in every line of code",
   },
   {
