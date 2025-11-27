@@ -104,7 +104,6 @@ export const ContactForm = () => {
       const body = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        // show helpful message from server if provided
         throw new Error(body?.error || body?.message || `Request failed (${res.status})`);
       }
 
